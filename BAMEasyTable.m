@@ -104,7 +104,7 @@
     self.searchController.delegate = nil;
     self.searchController.searchResultsDataSource = nil;
     self.searchController.searchResultsDelegate = nil;
-    [self.searchController release];
+    [searchController release];
     
     [super dealloc];
 }
@@ -361,11 +361,14 @@
     if (searchBar != nil) searchBar.placeholder = @"Search";
     
     self.tableView.tableHeaderView = searchBar;
-    
-    searchController = [[UISearchDisplayController alloc] initWithSearchBar:searchBar contentsController:self];
+  
+    UISearchDisplayController *searchDisplayController = [[UISearchDisplayController alloc] initWithSearchBar:searchBar contentsController:self];
+    self.searchController = searchDisplayController;
     self.searchController.delegate = self;
     self.searchController.searchResultsDataSource = self;
     self.searchController.searchResultsDelegate = self;
+    [searchDisplayController release];
+    [searchBar release];
 }
 
 - (void)createCountLabel {
@@ -392,14 +395,15 @@
     
     CGRect footerCellRect = CGRectMake(0.0f, 0.0f, self.tableView.bounds.size.width, 45.0f);
     
-    countLabel.text = [[NSString stringWithFormat:@"%d %@", count, countLabelText] copy];
+    self.countLabel.text = [NSString stringWithFormat:@"%d %@", count, countLabelText];
     
-    UITableViewCell *footerCell = [[[UITableViewCell alloc] initWithFrame:footerCellRect] autorelease];
+    UITableViewCell *footerCell = [[UITableViewCell alloc] initWithFrame:footerCellRect];
     
     if (self.tableView.tableFooterView != nil) self.tableView.tableFooterView = nil;
     footerCell.backgroundColor = [UIColor clearColor];
     [footerCell addSubview:countLabel];
     self.tableView.tableFooterView = footerCell;
+    [footerCell release];
 }
 
 
@@ -670,7 +674,7 @@
         NSMutableArray *fromSection = [[NSMutableArray alloc] initWithArray:[source objectAtIndex:fromIndexPath.section]];
         NSMutableArray *toSection = [[NSMutableArray alloc] initWithArray:[source objectAtIndex:toIndexPath.section]];    
         
-        [toSection insertObject:[[fromSection objectAtIndex:fromIndexPath.row] retain] atIndex:toIndexPath.row];
+        [toSection insertObject:[fromSection objectAtIndex:fromIndexPath.row] atIndex:toIndexPath.row];
         [fromSection removeObjectAtIndex:fromIndexPath.row];
         
         [source replaceObjectAtIndex:fromIndexPath.section withObject:fromSection];
@@ -721,11 +725,11 @@
     if (searchResult == nil) searchResult = [[NSMutableArray alloc] init];
     else [searchResult removeAllObjects];
     
-    BOOL searchMatchesBeginning, searchMatchesNewWordBeginning, searchMatchesSubstring = NO;
+    BOOL searchMatchesBeginning = NO, searchMatchesNewWordBeginning = NO, searchMatchesSubstring = NO;
     
     for (NSMutableArray *currentSection in source) {
         for (NSObject *currentObject in currentSection) {
-            NSString *stringToMatch;
+            NSString *stringToMatch = nil;
             if ([currentObject isKindOfClass:[NSString class]]) stringToMatch = (NSString *)currentObject;
             else if (searchStringMethodName != nil) stringToMatch = [currentObject performSelector:NSSelectorFromString(searchStringMethodName)];
             else if (textStringMethodName != nil) stringToMatch = [currentObject performSelector:NSSelectorFromString(textStringMethodName)]; 
