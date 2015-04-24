@@ -375,7 +375,7 @@
     CGRect labelRect = CGRectMake(0.0f, 0.0f, self.tableView.bounds.size.width, 45.0f);
     
     countLabel = [[UILabel alloc] initWithFrame:labelRect];
-    countLabel.textAlignment = UITextAlignmentCenter;
+    countLabel.textAlignment = NSTextAlignmentCenter;
     countLabel.backgroundColor = [UIColor clearColor];
     countLabel.shadowColor = [UIColor whiteColor];
     countLabel.shadowOffset = CGSizeMake(0.0f, 1.0f);
